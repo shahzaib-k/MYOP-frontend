@@ -1,20 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import AppProviders from "./src/context/AppProviders";
+import RootNavigator from "./src/navigation/RootNavigator";
 
+/**
+ * Entry point. All it does is mount the global providers and the navigator —
+ * every decision about what to render lives in RootNavigator.
+ */
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AppProviders>
+      <StatusBar style="dark" />
+      <RootNavigator />
+    </AppProviders>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
