@@ -8,6 +8,16 @@ export const ROUTES = {
   foodList: "FoodList",
   orderSummary: "OrderSummary",
   orderSuccess: "OrderSuccess",
+
+  orders: "Orders",
+  orderDetail: "OrderDetail",
+};
+
+/** Bottom tab names, kept separate from stack screen names to avoid collisions. */
+export const TABS = {
+  order: "OrderTab",
+  platter: "PlatterTab",
+  orders: "OrdersTab",
 };
 
 export default ROUTES;

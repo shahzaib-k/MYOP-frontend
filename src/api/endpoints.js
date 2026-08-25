@@ -6,6 +6,7 @@ export const ENDPOINTS = {
     me: "/api/auth/me",
     updateProfile: "/api/auth/me",
     changePassword: "/api/auth/me/password",
+    pushToken: "/api/auth/me/push-token",
   },
   categories: {
     list: "/api/categories",

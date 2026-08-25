@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import PrimaryButton from "../../components/common/PrimaryButton";
+import PrimaryButton from "../common/PrimaryButton";
 import { colors, shadows, spacing } from "../../constants/theme";
 
 /**

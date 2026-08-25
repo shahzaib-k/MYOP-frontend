@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Make Your Own Platter",
-    "slug": "make-your-own-platter",
+    "slug": "myop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.fyp.makeyourownplatter"
+      "package": "com.fyp.makeyourownplatter",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -25,7 +26,22 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
-    }
+      "backgroundColor": "#FFF1EB"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "#FF5A1F",
+          "defaultChannel": "default"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "878e1fd4-cac1-4d64-82ab-6de79bc0e4dc"
+      }
+    },
+    "owner": "shahzaib-112s-team"
   }
 }

@@ -46,3 +46,9 @@ export const changePassword = async ({ currentPassword, newPassword }) => {
 
   return unwrap(response);
 };
+
+export const registerPushToken = async (token) => {
+  const response = await apiClient.post(ENDPOINTS.auth.pushToken, { token });
+
+  return unwrap(response);
+};

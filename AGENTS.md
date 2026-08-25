@@ -18,13 +18,15 @@ Guidance for AI agents working on the "Make Your Own Platter" customer mobile ap
 - The server re-reads prices from the `foods` node. A `totalPrice` that disagrees with its own calculation, or a total above `budget`, is rejected.
 - `GET /api/foods/category/:category` is keyed by category **name**, not id.
 - `/api/categories` and `/api/recommendations/*` are public; recommendations need a positive `budget`, and `/review` also needs a non-empty `items` array.
+- `GET /api/orders` (own orders only) has no server-side status grouping beyond a single `?status=` value — `OrdersScreen`'s All/Active/Completed chips filter client-side over one fetched page, the same pattern `useFoods`/`useCategories` use elsewhere.
+- `PUT /api/orders/:id/cancel` only succeeds from `pending` or `preparing` (`canCancelOrder()` in `constants/orderStatus.js` mirrors this so the button is never shown when the backend would reject it).
 
 ## Architecture Rules
 
 - Keep the folder structure under `src/`:
   - `api/` — the axios instance, interceptors, endpoint paths
   - `assets/` — images and static files
-  - `components/` — reusable UI (`common/`, `food/`, `platter/`)
+  - `components/` — reusable UI (`common/`, `food/`, `platter/`, `orders/`, `navigation/`)
   - `constants/` — theme, config, storage keys, copy
   - `context/` — global state providers and their reducers
   - `hooks/` — reusable logic
@@ -36,8 +38,27 @@ Guidance for AI agents working on the "Make Your Own Platter" customer mobile ap
 - Screens compose components and hooks. They must not contain business logic, maths or API calls.
 - **Never import axios or call an endpoint from a screen.** Screens → hooks/services → `api/client.js`.
 - Pure calculations live in `utils/` (see `platterCalculations.js`), never inside components.
-- Sub-components used by exactly one screen may sit next to that screen (e.g. `screens/summary/OrderSummaryFooter.js`). Anything used twice moves to `components/`.
+- Sub-components used by exactly one screen may sit next to that screen. Anything used twice moves to `components/` (e.g. `components/platter/OrderSummaryFooter.js`, shared by `OrderSummaryScreen` and `PlatterScreen`).
 - No file may exceed **500 lines**. Split a screen into sub-components before it gets there.
+
+## Navigation Structure
+
+`RootNavigator` picks `AuthNavigator` (Login/Register) or `MainNavigator` based on `useAuth().isAuthenticated`. Once signed in, `MainNavigator` is a **bottom tab navigator** with three tabs, each its own stack where noted:
+
+- **Order** (`OrderStack.js`) — the ordering wizard, unchanged: Budget → Categories → Food list → Order summary → Success. `ROUTES` holds these stack screen names.
+- **Platter** (`screens/platter/PlatterScreen.js`) — a single screen, always reachable, showing the in-progress platter even if the customer never entered the Order tab this session. Its tab icon (`components/navigation/PlatterTabIcon.js`) reads `usePlatter()` directly for a live item-count badge.
+- **Orders** (`OrdersStack.js`) — order history (`OrdersScreen` with All/Active/Completed filter chips) and `OrderDetailScreen`, including cancelling a pending/preparing order.
+
+`OrderSummaryScreen` and `PlatterScreen` render the same UI via the shared `components/platter/PlatterView.js` — it takes navigation as callback props (`onBack`, `onBrowseCategories`, `onAddMore`, `onOrderPlaced`) rather than a `navigation` object, because `OrderSummaryScreen` navigates within the Order stack while `PlatterScreen` has to jump *into* the Order tab (`navigation.navigate(TABS.order, { screen, params })`). `TABS` (bottom tab route names) and `ROUTES` (stack screen names) are deliberately separate exports from `navigation/routes.js` — never reuse one set for the other.
+
+## Push Notifications
+
+The backend sends a push notification when an order is created and on every status change (see `../app-backend/services/notificationService.js`). The client side:
+
+- `services/notificationService.js` wraps `expo-notifications` — permission requests, the Android notification channel, and getting an Expo push token. **Requires a physical device and an EAS project** (`expo.extra.eas.projectId`, written by `eas init`) — it resolves to `null` on a simulator/emulator or before EAS is configured, and callers must handle that.
+- `hooks/usePushNotifications.js` registers the token with the backend (`POST /api/auth/me/push-token`) once signed in, and routes a tapped notification (data payload `{ orderId }`) to `OrderDetailScreen` via `navigation/navigationRef.js` — a nav ref exists because a notification tap can reopen the app before any screen has mounted. It's called once, from `MainNavigator` (which only renders while authenticated).
+- **Testing this requires an EAS development build** — Expo Go dropped remote push notification support. `expo start` alone is not enough; see the project README for the `eas login` / `eas init` / `eas build --profile development` steps.
+- `expo-notifications`' foreground-handler field names changed recently (`shouldShowBanner`/`shouldShowList` replaced `shouldShowAlert`) — re-check the versioned docs before touching `notificationService.js`, per the warning at the top of this file.
 
 ## JavaScript & React Standards
 

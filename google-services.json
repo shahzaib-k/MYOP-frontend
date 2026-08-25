@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "45383190149",
+    "firebase_url": "https://make-your-own-platter-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "make-your-own-platter",
+    "storage_bucket": "make-your-own-platter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45383190149:android:f6fc4c21c074fda2824bec",
+        "android_client_info": {
+          "package_name": "com.fyp.makeyourownplatter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXumzwdXZzUqhvT0HIv2jhn4x4m0J5TZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45383190149:android:a66504d4bd3a1c91824bec",
+        "android_client_info": {
+          "package_name": "com.shahzaib.platterapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXumzwdXZzUqhvT0HIv2jhn4x4m0J5TZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

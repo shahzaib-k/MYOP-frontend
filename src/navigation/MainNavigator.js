@@ -1,35 +1,94 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BudgetScreen from "../screens/budget/BudgetScreen";
-import CategoriesScreen from "../screens/categories/CategoriesScreen";
-import FoodListScreen from "../screens/foods/FoodListScreen";
-import OrderSummaryScreen from "../screens/summary/OrderSummaryScreen";
-import OrderSuccessScreen from "../screens/success/OrderSuccessScreen";
-import ROUTES from "./routes";
+import { StyleSheet } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+import OrderStack from "./OrderStack";
+import OrdersStack from "./OrdersStack";
+import PlatterScreen from "../screens/platter/PlatterScreen";
+import PlatterTabIcon from "../components/navigation/PlatterTabIcon";
+import usePushNotifications from "../hooks/usePushNotifications";
+import { TABS } from "./routes";
+import { colors, typography } from "../constants/theme";
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 /**
- * The ordering flow:
- *   Budget → Categories → Food list → Order summary → Success
+ * Signed-in shell: a minimal three-tab bar sitting above the ordering flow.
  *
- * Headers are disabled because every screen renders its own AppHeader, which
- * carries budget context the native header can't.
+ * "Order" keeps the existing Budget → Categories → Food list → Summary →
+ * Success stack untouched. "Platter" and "Orders" are always reachable —
+ * unlike the old design, reviewing the current platter or checking past
+ * orders no longer requires being mid-flow in the Order tab.
  */
-const MainNavigator = () => (
-  <Stack.Navigator
-    initialRouteName={ROUTES.budget}
-    screenOptions={{ headerShown: false, animation: "slide_from_right" }}
-  >
-    <Stack.Screen name={ROUTES.budget} component={BudgetScreen} />
-    <Stack.Screen name={ROUTES.categories} component={CategoriesScreen} />
-    <Stack.Screen name={ROUTES.foodList} component={FoodListScreen} />
-    <Stack.Screen name={ROUTES.orderSummary} component={OrderSummaryScreen} />
-    <Stack.Screen
-      name={ROUTES.orderSuccess}
-      component={OrderSuccessScreen}
-      options={{ gestureEnabled: false }}
-    />
-  </Stack.Navigator>
-);
+const MainNavigator = () => {
+  usePushNotifications();
+
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabBarLabel,
+        tabBarItemStyle: styles.tabBarItem,
+      }}
+    >
+      <Tab.Screen
+        name={TABS.order}
+        component={OrderStack}
+        options={{
+          tabBarLabel: "Order",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "restaurant" : "restaurant-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name={TABS.platter}
+        component={PlatterScreen}
+        options={{
+          tabBarLabel: "Platter",
+          tabBarIcon: (props) => <PlatterTabIcon {...props} />,
+        }}
+      />
+      <Tab.Screen
+        name={TABS.orders}
+        component={OrdersStack}
+        options={{
+          tabBarLabel: "Orders",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "receipt" : "receipt-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+const styles = StyleSheet.create({
+  tabBar: {
+    backgroundColor: colors.surface,
+    borderTopColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  tabBarLabel: {
+    ...typography.label,
+    fontSize: 11,
+    letterSpacing: 0,
+    textTransform: "none",
+    fontWeight: "600",
+  },
+  tabBarItem: {
+    paddingTop: 4,
+  },
+});
 
 export default MainNavigator;

@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigator from "./AuthNavigator";
 import MainNavigator from "./MainNavigator";
 import navigationTheme from "./navigationTheme";
+import { navigationRef } from "./navigationRef";
 import SplashScreen from "../screens/splash/SplashScreen";
 import useAuth from "../hooks/useAuth";
 import usePlatter from "../hooks/usePlatter";
@@ -35,7 +36,7 @@ const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
     </NavigationContainer>
   );
