@@ -1,11 +1,13 @@
 import { useCallback, useMemo } from "react";
 import {
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import ScreenContainer from "../../components/common/ScreenContainer";
 import AppHeader from "../../components/common/AppHeader";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
@@ -21,7 +23,7 @@ import { formatCurrency } from "../../utils/currency";
 import { getColumnCount } from "../../utils/responsive";
 import MESSAGES from "../../constants/messages";
 import ROUTES from "../../navigation/routes";
-import { colors, spacing } from "../../constants/theme";
+import { colors, radii, spacing } from "../../constants/theme";
 
 const MIN_TILE_WIDTH = 168;
 const GRID_PADDING = spacing.xl * 2;
@@ -114,11 +116,22 @@ const CategoriesScreen = ({ navigation }) => {
         subtitle="Pick where you want to start"
         onBack={() => navigation.goBack()}
         rightSlot={
-          <Badge
-            label={formatCurrency(budget)}
-            tone="primary"
-            iconName="wallet-outline"
-          />
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={() => navigation.navigate(ROUTES.favourites)}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Open favourites"
+              style={styles.favouritesButton}
+            >
+              <Ionicons name="heart" size={18} color={colors.danger} />
+            </Pressable>
+            <Badge
+              label={formatCurrency(budget)}
+              tone="primary"
+              iconName="wallet-outline"
+            />
+          </View>
         }
       />
 
@@ -137,6 +150,19 @@ const CategoriesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
+  },
+  headerActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+  },
+  favouritesButton: {
+    width: 34,
+    height: 34,
+    borderRadius: radii.pill,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.dangerSoft,
   },
   list: {
     paddingHorizontal: spacing.xl,

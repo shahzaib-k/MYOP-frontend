@@ -9,6 +9,7 @@ import EmptyState from "../../components/common/EmptyState";
 import OrderCard from "../../components/orders/OrderCard";
 import OrderFilterTabs from "../../components/orders/OrderFilterTabs";
 import useOrders from "../../hooks/useOrders";
+import useReorder from "../../hooks/useReorder";
 import { isActiveOrder } from "../../constants/orderStatus";
 import ROUTES from "../../navigation/routes";
 import { colors, spacing } from "../../constants/theme";
@@ -86,9 +87,13 @@ const OrdersScreen = ({ navigation }) => {
     [navigation]
   );
 
+  const { reorder } = useReorder(navigation);
+
   const renderItem = useCallback(
-    ({ item }) => <OrderCard order={item} onPress={handleOpenOrder} />,
-    [handleOpenOrder]
+    ({ item }) => (
+      <OrderCard order={item} onPress={handleOpenOrder} onReorder={reorder} />
+    ),
+    [handleOpenOrder, reorder]
   );
 
   const renderBody = () => {

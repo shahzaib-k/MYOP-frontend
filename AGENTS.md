@@ -17,6 +17,7 @@ Guidance for AI agents working on the "Make Your Own Platter" customer mobile ap
 - `POST /api/orders` accepts **only** `items: [{ foodId, quantity }]`, `totalPrice?` and `budget?`. Any other key is rejected.
 - The server re-reads prices from the `foods` node. A `totalPrice` that disagrees with its own calculation, or a total above `budget`, is rejected.
 - `GET /api/foods/category/:category` is keyed by category **name**, not id.
+- Every food carries `available` (boolean). `available === false` means **sold out**: the card is greyed with a "Sold out" badge and cannot be added (`utils/foodAvailability.js` `isSoldOut`; `PlatterContext.addItem` also refuses it), the server never suggests it, and `POST /api/orders` rejects an order containing it. A food **without** the field counts as available, so the app still works against an older backend.
 - `/api/categories` and `/api/recommendations/*` are public; recommendations need a positive `budget`, and `/review` also needs a non-empty `items` array.
 - `GET /api/orders` (own orders only) has no server-side status grouping beyond a single `?status=` value — `OrdersScreen`'s All/Active/Completed chips filter client-side over one fetched page, the same pattern `useFoods`/`useCategories` use elsewhere.
 - `PUT /api/orders/:id/cancel` only succeeds from `pending` or `preparing` (`canCancelOrder()` in `constants/orderStatus.js` mirrors this so the button is never shown when the backend would reject it).
@@ -43,11 +44,12 @@ Guidance for AI agents working on the "Make Your Own Platter" customer mobile ap
 
 ## Navigation Structure
 
-`RootNavigator` picks `AuthNavigator` (Login/Register) or `MainNavigator` based on `useAuth().isAuthenticated`. Once signed in, `MainNavigator` is a **bottom tab navigator** with three tabs, each its own stack where noted:
+`RootNavigator` picks `AuthNavigator` (Login/Register) or `MainNavigator` based on `useAuth().isAuthenticated`. Once signed in, `MainNavigator` is a **bottom tab navigator** with four tabs, each its own stack where noted:
 
-- **Order** (`OrderStack.js`) — the ordering wizard, unchanged: Budget → Categories → Food list → Order summary → Success. `ROUTES` holds these stack screen names.
+- **Order** (`OrderStack.js`) — the ordering wizard: Budget → Categories → Food list → Order summary → Success, plus `FavouritesScreen` (opened from the heart in the Categories header, or from the Profile menu with `navigate(TABS.order, { screen: ROUTES.favourites, initial: false })` so Budget stays under it). `ROUTES` holds these stack screen names.
 - **Platter** (`screens/platter/PlatterScreen.js`) — a single screen, always reachable, showing the in-progress platter even if the customer never entered the Order tab this session. Its tab icon (`components/navigation/PlatterTabIcon.js`) reads `usePlatter()` directly for a live item-count badge.
-- **Orders** (`OrdersStack.js`) — order history (`OrdersScreen` with All/Active/Completed filter chips) and `OrderDetailScreen`, including cancelling a pending/preparing order.
+- **Orders** (`OrdersStack.js`) — order history (`OrdersScreen` with All/Active/Completed filter chips) and `OrderDetailScreen`, including cancelling a pending/preparing order. Both screens offer **Reorder** via `hooks/useReorder.js`: it re-fetches the menu, `utils/reorder.js` rebuilds the platter at *today's* prices (skipping sold-out or removed items and telling the customer), raises the budget to the new total if prices rose, then opens the Platter tab. It never places an order itself.
+- **Profile** (`ProfileStack.js`) — `ProfileScreen` (avatar, order stats from `useProfileStats`, sign out with confirmation), `EditProfileScreen` (`PUT /api/auth/me`, name and phone only; the backend rejects an empty `phone`, so a saved number can be changed but not cleared) and `ChangePasswordScreen` (`PUT /api/auth/me/password`). The axios interceptor in `api/client.js` deliberately does **not** treat a 401 from the login or change-password endpoints as an expired session — a wrong current password must show an error, not sign the user out.
 
 `OrderSummaryScreen` and `PlatterScreen` render the same UI via the shared `components/platter/PlatterView.js` — it takes navigation as callback props (`onBack`, `onBrowseCategories`, `onAddMore`, `onOrderPlaced`) rather than a `navigation` object, because `OrderSummaryScreen` navigates within the Order stack while `PlatterScreen` has to jump *into* the Order tab (`navigation.navigate(TABS.order, { screen, params })`). `TABS` (bottom tab route names) and `ROUTES` (stack screen names) are deliberately separate exports from `navigation/routes.js` — never reuse one set for the other.
 
@@ -72,9 +74,10 @@ The backend sends a push notification when an order is created and on every stat
 
 ## State Management
 
-- Global state is React Context + `useReducer`. Two providers only:
+- Global state is React Context. Three providers only:
   - `AuthContext` — user, token, sign in/up/out, session restore
-  - `PlatterContext` — budget, selected items, derived totals
+  - `FavouritesContext` — the hearted food ids, stored on the device per account (`STORAGE_KEYS.favouritesFor(userId)`). Ids only; `useFavouriteFoods` resolves them against the live menu so prices and sold-out state are never stale. Needs no backend.
+  - `PlatterContext` — budget, selected items, derived totals (uses `useReducer`)
 - Derived values (`summary`, `quantityByFoodId`) are computed in the provider with `useMemo` — never recomputed inside a screen.
 - Read state through `useAuth()` / `usePlatter()`. Do not import the contexts directly, and do not prop-drill state a hook can supply.
 - `AsyncStorage` holds only the auth token, the cached user and the budget. Keys live in `constants/storageKeys.js`.

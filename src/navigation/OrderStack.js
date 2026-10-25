@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BudgetScreen from "../screens/budget/BudgetScreen";
 import CategoriesScreen from "../screens/categories/CategoriesScreen";
 import FoodListScreen from "../screens/foods/FoodListScreen";
+import FavouritesScreen from "../screens/favourites/FavouritesScreen";
 import OrderSummaryScreen from "../screens/summary/OrderSummaryScreen";
 import OrderSuccessScreen from "../screens/success/OrderSuccessScreen";
 import ROUTES from "./routes";
@@ -23,6 +24,7 @@ const OrderStack = () => (
     <Stack.Screen name={ROUTES.budget} component={BudgetScreen} />
     <Stack.Screen name={ROUTES.categories} component={CategoriesScreen} />
     <Stack.Screen name={ROUTES.foodList} component={FoodListScreen} />
+    <Stack.Screen name={ROUTES.favourites} component={FavouritesScreen} />
     <Stack.Screen name={ROUTES.orderSummary} component={OrderSummaryScreen} />
     <Stack.Screen
       name={ROUTES.orderSuccess}

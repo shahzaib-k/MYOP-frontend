@@ -47,11 +47,15 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error?.response?.status;
 
-    // 401 on the login endpoint just means "wrong password" — only treat it as
-    // an expired session for requests made with a token we already held.
-    const isLoginAttempt = error?.config?.url?.includes("/api/auth/login");
+    // 401 on the login and change-password endpoints just means "wrong
+    // password" — only treat it as an expired session for requests made with a
+    // token we already held.
+    const requestUrl = error?.config?.url || "";
+    const isCredentialCheck =
+      requestUrl.includes("/api/auth/login") ||
+      requestUrl.includes("/api/auth/me/password");
 
-    if (status === 401 && authToken && !isLoginAttempt && unauthorizedHandler) {
+    if (status === 401 && authToken && !isCredentialCheck && unauthorizedHandler) {
       unauthorizedHandler();
     }
 

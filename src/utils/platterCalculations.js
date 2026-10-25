@@ -1,5 +1,6 @@
 import { roundAmount } from "./currency";
 import { MAX_SUGGESTIONS } from "../constants/config";
+import { isSoldOut } from "./foodAvailability";
 
 /**
  * Pure platter maths. Kept free of React so it can be reasoned about and
@@ -81,7 +82,10 @@ export const findLocalSuggestions = (
 
   return foods
     .filter(
-      (food) => !excluded.has(food.id) && Number(food.price) <= remainingBudget
+      (food) =>
+        !excluded.has(food.id) &&
+        !isSoldOut(food) &&
+        Number(food.price) <= remainingBudget
     )
     .sort((a, b) => Number(b.price) - Number(a.price))
     .slice(0, limit);

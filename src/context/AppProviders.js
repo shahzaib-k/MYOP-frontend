@@ -1,5 +1,6 @@
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "./AuthContext";
+import { FavouritesProvider } from "./FavouritesContext";
 import { PlatterProvider } from "./PlatterContext";
 
 /**
@@ -9,7 +10,9 @@ import { PlatterProvider } from "./PlatterContext";
 export const AppProviders = ({ children }) => (
   <SafeAreaProvider>
     <AuthProvider>
-      <PlatterProvider>{children}</PlatterProvider>
+      <FavouritesProvider>
+        <PlatterProvider>{children}</PlatterProvider>
+      </FavouritesProvider>
     </AuthProvider>
   </SafeAreaProvider>
 );

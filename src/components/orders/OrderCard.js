@@ -66,7 +66,7 @@ const PulsingDot = ({ color }) => {
 };
 
 /** One row in the order history list. Tapping opens OrderDetailScreen. */
-const OrderCard = ({ order, onPress }) => {
+const OrderCard = ({ order, onPress, onReorder }) => {
   const status = getStatusMeta(order.status);
   const accentColor = ACCENT_BY_TONE[status.tone] || colors.textMuted;
   const itemCount = order.items?.length || 0;
@@ -114,6 +114,22 @@ const OrderCard = ({ order, onPress }) => {
                 {itemCount} {itemCount === 1 ? "item" : "items"}
               </Text>
             </View>
+
+            {onReorder ? (
+              <Pressable
+                onPress={() => onReorder(order)}
+                hitSlop={6}
+                accessibilityRole="button"
+                accessibilityLabel="Reorder this order"
+                style={({ pressed }) => [
+                  styles.reorderButton,
+                  pressed && styles.reorderButtonPressed,
+                ]}
+              >
+                <Ionicons name="repeat-outline" size={14} color={colors.primaryDark} />
+                <Text style={styles.reorderLabel}>Reorder</Text>
+              </Pressable>
+            ) : null}
 
             <View style={styles.totalGroup}>
               <Text style={styles.total}>{formatCurrency(order.totalPrice)}</Text>
@@ -188,6 +204,22 @@ const styles = StyleSheet.create({
   itemCount: {
     ...typography.caption,
     color: colors.textSecondary,
+  },
+  reorderButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xxs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+    backgroundColor: colors.primarySoft,
+  },
+  reorderButtonPressed: {
+    backgroundColor: colors.primarySoftPressed,
+  },
+  reorderLabel: {
+    ...typography.captionStrong,
+    color: colors.primaryDark,
   },
   totalGroup: {
     flexDirection: "row",

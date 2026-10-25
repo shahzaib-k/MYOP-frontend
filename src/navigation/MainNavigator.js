@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import OrderStack from "./OrderStack";
 import OrdersStack from "./OrdersStack";
+import ProfileStack from "./ProfileStack";
 import PlatterScreen from "../screens/platter/PlatterScreen";
 import PlatterTabIcon from "../components/navigation/PlatterTabIcon";
 import usePushNotifications from "../hooks/usePushNotifications";
@@ -12,7 +13,7 @@ import { colors, typography } from "../constants/theme";
 const Tab = createBottomTabNavigator();
 
 /**
- * Signed-in shell: a minimal three-tab bar sitting above the ordering flow.
+ * Signed-in shell: a minimal four-tab bar sitting above the ordering flow.
  *
  * "Order" keeps the existing Budget → Categories → Food list → Summary →
  * Success stack untouched. "Platter" and "Orders" are always reachable —
@@ -63,6 +64,20 @@ const MainNavigator = () => {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "receipt" : "receipt-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name={TABS.profile}
+        component={ProfileStack}
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
               size={size}
               color={color}
             />

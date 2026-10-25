@@ -11,6 +11,7 @@ import SuggestionsSection from "../../components/food/SuggestionsSection";
 import BudgetSummary from "../../components/platter/BudgetSummary";
 import CartButton from "../../components/platter/CartButton";
 import useFoods from "../../hooks/useFoods";
+import useFavourites from "../../hooks/useFavourites";
 import usePlatter from "../../hooks/usePlatter";
 import useSuggestions from "../../hooks/useSuggestions";
 import { formatCurrency } from "../../utils/currency";
@@ -36,7 +37,10 @@ const FoodListScreen = ({ navigation, route }) => {
     addItem,
     incrementItem,
     decrementItem,
+    removeFromPlatter,
   } = usePlatter();
+
+  const { favouriteSet, toggleFavourite } = useFavourites();
 
   const { suggestions, isLoading: isLoadingSuggestions, usedFallback } =
     useSuggestions(foods);
@@ -50,13 +54,25 @@ const FoodListScreen = ({ navigation, route }) => {
           food={item}
           quantity={quantityByFoodId[item.id] || 0}
           remainingBudget={summary.remaining}
+          isFavourite={favouriteSet.has(item.id)}
           onAdd={addItem}
           onIncrement={incrementItem}
           onDecrement={decrementItem}
+          onRemove={removeFromPlatter}
+          onToggleFavourite={toggleFavourite}
         />
       </View>
     ),
-    [quantityByFoodId, summary.remaining, addItem, incrementItem, decrementItem]
+    [
+      quantityByFoodId,
+      summary.remaining,
+      favouriteSet,
+      addItem,
+      incrementItem,
+      decrementItem,
+      removeFromPlatter,
+      toggleFavourite,
+    ]
   );
 
   const listHeader = (

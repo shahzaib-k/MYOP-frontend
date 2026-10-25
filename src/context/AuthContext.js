@@ -176,6 +176,24 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  /**
+   * Saves name/phone changes and keeps the cached profile in sync. Throws on
+   * failure so the calling form can show the backend's message.
+   */
+  const updateProfile = useCallback(async (updates) => {
+    const user = await authService.updateProfile(updates);
+
+    if (user) {
+      await setObject(STORAGE_KEYS.authUser, user);
+
+      if (isMounted.current) {
+        dispatch({ type: ACTIONS.SET_USER, payload: user });
+      }
+    }
+
+    return user;
+  }, []);
+
   const clearError = useCallback(
     () => dispatch({ type: ACTIONS.CLEAR_ERROR }),
     []
@@ -189,9 +207,10 @@ export const AuthProvider = ({ children }) => {
       signUp,
       signOut,
       refreshProfile,
+      updateProfile,
       clearError,
     }),
-    [state, signIn, signUp, signOut, refreshProfile, clearError]
+    [state, signIn, signUp, signOut, refreshProfile, updateProfile, clearError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

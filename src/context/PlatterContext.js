@@ -6,6 +6,7 @@ import platterReducer, {
 import STORAGE_KEYS from "../constants/storageKeys";
 import { getObject, removeItem, setObject } from "../utils/storage";
 import { summarizePlatter } from "../utils/platterCalculations";
+import { isSoldOut } from "../utils/foodAvailability";
 
 /**
  * Global platter state: the budget, the selected items and every total derived
@@ -37,6 +38,11 @@ export const PlatterProvider = ({ children }) => {
   }, []);
 
   const addItem = useCallback((food, quantity = 1) => {
+    // Sold-out items can't be ordered, whichever screen tries to add one.
+    if (isSoldOut(food)) {
+      return;
+    }
+
     dispatch({ type: PLATTER_ACTIONS.ADD_ITEM, payload: { food, quantity } });
   }, []);
 

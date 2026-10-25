@@ -10,6 +10,7 @@ import OrderItemRow from "../../components/orders/OrderItemRow";
 import OrderStatusStepper from "../../components/orders/OrderStatusStepper";
 import useFetch from "../../hooks/useFetch";
 import useSubmit from "../../hooks/useSubmit";
+import useReorder from "../../hooks/useReorder";
 import { cancelOrder, fetchOrderById } from "../../services/orderService";
 import { formatCurrency } from "../../utils/currency";
 import { canCancelOrder, getStatusMeta } from "../../constants/orderStatus";
@@ -49,6 +50,9 @@ const OrderDetailScreen = ({ navigation, route }) => {
 
   const submitCancel = useCallback(() => cancelOrder(order.orderId), [order]);
   const { submit, isSubmitting, error, reset } = useSubmit(submitCancel);
+  const { reorder, isReordering } = useReorder(navigation);
+
+  const handleReorder = useCallback(() => reorder(order), [reorder, order]);
 
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(12)).current;
@@ -182,8 +186,16 @@ const OrderDetailScreen = ({ navigation, route }) => {
         </Animated.View>
       </ScrollView>
 
-      {canCancelOrder(order.status) ? (
-        <View style={styles.footer}>
+      <View style={styles.footer}>
+        <PrimaryButton
+          label="Reorder"
+          onPress={handleReorder}
+          size="medium"
+          isLoading={isReordering}
+          iconName="repeat-outline"
+        />
+
+        {canCancelOrder(order.status) ? (
           <PrimaryButton
             label="Cancel order"
             onPress={handleCancel}
@@ -192,8 +204,8 @@ const OrderDetailScreen = ({ navigation, route }) => {
             isLoading={isSubmitting}
             iconName="close-circle-outline"
           />
-        </View>
-      ) : null}
+        ) : null}
+      </View>
     </ScreenContainer>
   );
 };
@@ -267,6 +279,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   footer: {
+    gap: spacing.sm,
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
