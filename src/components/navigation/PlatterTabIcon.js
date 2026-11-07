@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import usePlatter from "../../hooks/usePlatter";
-import { colors, radii, typography } from "../../constants/theme";
+import { radii, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Tab icon for the Platter tab. Reads the live item count itself (rather than
@@ -9,6 +11,9 @@ import { colors, radii, typography } from "../../constants/theme";
  * added, no matter which tab is currently focused.
  */
 const PlatterTabIcon = ({ color, size, focused }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { summary } = usePlatter();
   const count = summary.itemCount;
 
@@ -27,7 +32,7 @@ const PlatterTabIcon = ({ color, size, focused }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   wrapper: {
     width: 24,
     height: 24,

@@ -12,7 +12,8 @@ import useOrders from "../../hooks/useOrders";
 import useReorder from "../../hooks/useReorder";
 import { isActiveOrder } from "../../constants/orderStatus";
 import ROUTES from "../../navigation/routes";
-import { colors, spacing } from "../../constants/theme";
+import { spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimentalAndroid) {
   UIManager.setLayoutAnimationEnabledExperimentalAndroid(true);
@@ -41,6 +42,9 @@ const EMPTY_COPY = {
 
 /** Order history: All / Active (pending + preparing) / Completed. */
 const OrdersScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { orders, isLoading, isRefreshing, error, refetch, refresh } = useOrders();
   const [filter, setFilter] = useState("all");
 
@@ -153,7 +157,7 @@ const OrdersScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   filters: {
     paddingHorizontal: spacing.xl,
     marginBottom: spacing.md,

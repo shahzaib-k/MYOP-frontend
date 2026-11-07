@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
-import { colors, radii, shadows, spacing } from "../../constants/theme";
+import { radii, shadows, spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Rounded, softly shadowed surface used for every card in the app.
@@ -15,6 +16,9 @@ const Card = ({
   style,
   ...rest
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const cardStyle = [
     styles.card,
     shadows[elevation] || shadows.soft,
@@ -42,7 +46,7 @@ const Card = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     backgroundColor: colors.surface,
     borderRadius: radii.xl,

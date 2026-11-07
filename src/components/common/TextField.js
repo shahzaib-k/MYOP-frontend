@@ -1,7 +1,8 @@
-import { forwardRef, memo, useState } from "react";
+import { forwardRef, memo, useState, useMemo } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Labelled text input with focus and error states, an optional leading icon,
@@ -27,6 +28,9 @@ const TextField = forwardRef(
     },
     ref
   ) => {
+    const { colors } = useTheme();
+    const styles = useMemo(() => createStyles(colors), [colors]);
+
     const [isFocused, setIsFocused] = useState(false);
     const [isSecureVisible, setIsSecureVisible] = useState(false);
 
@@ -98,7 +102,7 @@ const TextField = forwardRef(
 
 TextField.displayName = "TextField";
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     gap: spacing.xs,
   },

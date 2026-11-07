@@ -1,13 +1,17 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "../common/Card";
 import RemoteImage from "../common/RemoteImage";
 import { formatCurrency } from "../../utils/currency";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /** Compact tile used in the horizontal Smart Suggestions strip. */
 const SuggestionCard = ({ food, onAdd }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const handleAdd = useCallback(() => onAdd(food), [onAdd, food]);
 
   return (
@@ -35,7 +39,7 @@ const SuggestionCard = ({ food, onAdd }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     width: 150,
   },

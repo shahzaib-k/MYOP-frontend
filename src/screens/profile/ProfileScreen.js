@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import ScreenContainer from "../../components/common/ScreenContainer";
@@ -6,13 +6,18 @@ import AppHeader from "../../components/common/AppHeader";
 import ProfileHeaderCard from "../../components/profile/ProfileHeaderCard";
 import ProfileStats from "../../components/profile/ProfileStats";
 import ProfileMenuItem from "../../components/profile/ProfileMenuItem";
+import AppearanceSelector from "../../components/profile/AppearanceSelector";
 import useAuth from "../../hooks/useAuth";
 import useProfileStats from "../../hooks/useProfileStats";
 import ROUTES, { TABS } from "../../navigation/routes";
-import { colors, radii, spacing } from "../../constants/theme";
+import { radii, spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /** Account hub: who you are, your order numbers, and account actions. */
 const ProfileScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { user, signOut } = useAuth();
   const { stats, isLoading, refetch } = useProfileStats();
 
@@ -81,6 +86,8 @@ const ProfileScreen = ({ navigation }) => {
           />
         </View>
 
+        <AppearanceSelector />
+
         <View style={styles.menu}>
           <ProfileMenuItem
             iconName="log-out-outline"
@@ -94,7 +101,7 @@ const ProfileScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   content: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xxxl,

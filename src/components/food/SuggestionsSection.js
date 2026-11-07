@@ -1,9 +1,10 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
 import SuggestionCard from "./SuggestionCard";
 import Badge from "../common/Badge";
 import { formatCurrency } from "../../utils/currency";
-import { colors, spacing, typography } from "../../constants/theme";
+import { spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Smart Suggestions strip: items that still fit inside the remaining budget.
@@ -17,6 +18,9 @@ const SuggestionsSection = ({
   usedFallback,
   onAdd,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (remainingBudget <= 0) {
     return null;
   }
@@ -58,7 +62,7 @@ const SuggestionsSection = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     marginBottom: spacing.lg,
   },

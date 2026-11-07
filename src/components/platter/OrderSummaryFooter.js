@@ -1,8 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PrimaryButton from "../common/PrimaryButton";
-import { colors, shadows, spacing } from "../../constants/theme";
+import { shadows, spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Docked action bar for the order summary. Placing an order is blocked while
@@ -13,9 +14,13 @@ const OrderSummaryFooter = ({
   isOverBudget,
   isEmpty,
   isSubmitting,
+  needsPaymentMethod,
   onPlaceOrder,
   onAddMore,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const insets = useSafeAreaInsets();
 
   return (
@@ -34,17 +39,23 @@ const OrderSummaryFooter = ({
       />
 
       <PrimaryButton
-        label={isOverBudget ? "Budget exceeded" : "Place order"}
+        label={
+          isOverBudget
+            ? "Budget exceeded"
+            : needsPaymentMethod
+              ? "Choose a payment method"
+              : "Place order"
+        }
         onPress={onPlaceOrder}
         isLoading={isSubmitting}
-        disabled={isOverBudget || isEmpty}
+        disabled={isOverBudget || isEmpty || needsPaymentMethod}
         iconName={isOverBudget ? "warning-outline" : "checkmark-circle-outline"}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,

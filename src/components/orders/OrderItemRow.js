@@ -1,24 +1,30 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { formatCurrency } from "../../utils/currency";
-import { colors, spacing, typography } from "../../constants/theme";
+import { spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /** Read-only line item for a placed order — no quantity controls, unlike PlatterItemRow. */
-const OrderItemRow = ({ item }) => (
-  <View style={styles.row}>
-    <View style={styles.details}>
-      <Text style={styles.name} numberOfLines={1}>
-        {item.name}
-      </Text>
-      <Text style={styles.meta}>
-        {formatCurrency(item.price)} × {item.quantity}
-      </Text>
-    </View>
-    <Text style={styles.subtotal}>{formatCurrency(item.subtotal)}</Text>
-  </View>
-);
+const OrderItemRow = ({ item }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
-const styles = StyleSheet.create({
+  return (
+    <View style={styles.row}>
+      <View style={styles.details}>
+        <Text style={styles.name} numberOfLines={1}>
+          {item.name}
+        </Text>
+        <Text style={styles.meta}>
+          {formatCurrency(item.price)} × {item.quantity}
+        </Text>
+      </View>
+      <Text style={styles.subtotal}>{formatCurrency(item.subtotal)}</Text>
+    </View>
+  );
+};
+
+const createStyles = (colors) => StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",

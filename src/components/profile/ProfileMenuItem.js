@@ -1,10 +1,14 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /** One tappable row in the profile menu. `danger` styles destructive actions. */
 const ProfileMenuItem = ({ iconName, label, value, onPress, danger = false }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const tint = danger ? colors.danger : colors.primary;
 
   return (
@@ -33,7 +37,7 @@ const ProfileMenuItem = ({ iconName, label, value, onPress, danger = false }) =>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",

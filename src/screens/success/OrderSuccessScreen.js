@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useMemo } from "react";
 import { Animated, Easing, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenContainer from "../../components/common/ScreenContainer";
@@ -7,13 +7,17 @@ import Badge from "../../components/common/Badge";
 import usePlatter from "../../hooks/usePlatter";
 import { formatCurrency } from "../../utils/currency";
 import ROUTES from "../../navigation/routes";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Step 5: confirmation. The order object comes straight from the API response,
  * so the order number and totals shown here are the server's, not ours.
  */
 const OrderSuccessScreen = ({ navigation, route }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { order, message } = route.params || {};
   const { resetPlatter } = usePlatter();
 
@@ -121,7 +125,7 @@ const OrderSuccessScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   content: {
     flexGrow: 1,
     alignItems: "center",

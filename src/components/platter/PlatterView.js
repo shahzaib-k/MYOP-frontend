@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import ScreenContainer from "../common/ScreenContainer";
 import AppHeader from "../common/AppHeader";
@@ -9,10 +9,13 @@ import PlatterItemRow from "./PlatterItemRow";
 import OrderTotals from "./OrderTotals";
 import AlternativesSection from "./AlternativesSection";
 import OrderSummaryFooter from "./OrderSummaryFooter";
+import PaymentMethodSelector from "./PaymentMethodSelector";
 import usePlatter from "../../hooks/usePlatter";
 import useSubmit from "../../hooks/useSubmit";
 import useSuggestions from "../../hooks/useSuggestions";
-import { placeOrder } from "../../services/orderService";
+import { cancelOrder, placeOrder } from "../../services/orderService";
+import { confirmOrderPayment, payForOrder } from "../../services/paymentService";
+import { PAYMENT_METHOD } from "../../constants/paymentMethods";
 import MESSAGES from "../../constants/messages";
 import { spacing } from "../../constants/theme";
 
@@ -40,15 +43,33 @@ const PlatterView = ({ onBack, onBrowseCategories, onAddMore, onOrderPlaced }) =
 
   const { alternatives } = useSuggestions();
 
+  // No default: the customer must explicitly pick how they will pay.
+  const [paymentMethod, setPaymentMethod] = useState(null);
+
   const submitOrder = useCallback(async () => {
     const { data: order, message } = await placeOrder({
       items,
       totalPrice: summary.total,
       budget: summary.budget,
+      paymentMethod,
     });
 
-    return { order, message };
-  }, [items, summary.total, summary.budget]);
+    if (paymentMethod !== PAYMENT_METHOD.card) {
+      return { order, message };
+    }
+
+    try {
+      await payForOrder(order);
+    } catch (paymentFailure) {
+      // Don't leave an unpaid card order behind; the platter stays so they can retry.
+      await cancelOrder(order.orderId).catch(() => null);
+      throw paymentFailure;
+    }
+
+    const confirmedOrder = await confirmOrderPayment(order.orderId);
+
+    return { order: confirmedOrder, message };
+  }, [items, summary.total, summary.budget, paymentMethod]);
 
   const { submit, isSubmitting, error, errorDetails, reset } = useSubmit(submitOrder);
 
@@ -105,6 +126,12 @@ const PlatterView = ({ onBack, onBrowseCategories, onAddMore, onOrderPlaced }) =
 
       <OrderTotals summary={summary} />
 
+      <PaymentMethodSelector
+        value={paymentMethod}
+        onChange={setPaymentMethod}
+        disabled={isSubmitting}
+      />
+
       {error ? (
         <ErrorMessage
           message={error}
@@ -154,6 +181,7 @@ const PlatterView = ({ onBack, onBrowseCategories, onAddMore, onOrderPlaced }) =
             isOverBudget={summary.isOverBudget}
             isEmpty={isEmpty}
             isSubmitting={isSubmitting}
+            needsPaymentMethod={paymentMethod === null}
             onPlaceOrder={handlePlaceOrder}
             onAddMore={onAddMore}
           />

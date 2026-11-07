@@ -1,8 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PrimaryButton from "./PrimaryButton";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Error surface with two shapes:
@@ -19,6 +20,9 @@ const ErrorMessage = ({
   variant = "inline",
   style,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (!message) {
     return null;
   }
@@ -65,7 +69,7 @@ const ErrorMessage = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   inline: {
     backgroundColor: colors.dangerSoft,
     borderRadius: radii.md,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,12 +14,13 @@ import TextField from "../../components/common/TextField";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import ChipGroup from "../../components/common/ChipGroup";
 import { CURRENCY_SYMBOL } from "../../constants/config";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
 import { sanitizeNumericInput } from "../../utils/currency";
 import { validateBudget } from "../../validations/budgetValidation";
 import usePlatter from "../../hooks/usePlatter";
 import useAuth from "../../hooks/useAuth";
 import ROUTES from "../../navigation/routes";
+import useTheme from "../../hooks/useTheme";
 
 const QUICK_AMOUNTS = [500, 1000, 1500, 2500].map((amount) => ({
   label: `${CURRENCY_SYMBOL} ${amount}`,
@@ -31,6 +32,9 @@ const QUICK_AMOUNTS = [500, 1000, 1500, 2500].map((amount) => ({
  * PlatterContext (and persisted) so every later screen can price against it.
  */
 const BudgetScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { budget, setBudget } = usePlatter();
   const { user, signOut } = useAuth();
 
@@ -150,7 +154,7 @@ const BudgetScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   flex: {
     flex: 1,
   },

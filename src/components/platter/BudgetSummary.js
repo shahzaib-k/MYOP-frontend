@@ -1,9 +1,10 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ProgressBar from "../common/ProgressBar";
 import { formatCurrency } from "../../utils/currency";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Budget, current total and remaining budget, with a usage bar.
@@ -15,7 +16,7 @@ import { colors, radii, shadows, spacing, typography } from "../../constants/the
  */
 const NEAR_LIMIT_RATIO = 0.85;
 
-const getStatus = (summary) => {
+const getStatus = (summary, colors) => {
   if (summary.isOverBudget) {
     return { color: colors.danger, tone: "danger" };
   }
@@ -28,7 +29,10 @@ const getStatus = (summary) => {
 };
 
 const BudgetSummary = ({ summary, style }) => {
-  const status = getStatus(summary);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const status = getStatus(summary, colors);
 
   return (
     <View style={[styles.container, style]}>
@@ -73,7 +77,7 @@ const BudgetSummary = ({ summary, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     borderRadius: radii.xl,

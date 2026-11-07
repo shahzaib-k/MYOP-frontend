@@ -1,15 +1,19 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "../common/Card";
 import RemoteImage from "../common/RemoteImage";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Grid tile for a food category. Sized by the parent through `style` so the
  * Categories screen can pick its own column count responsively.
  */
 const CategoryCard = ({ category, onPress, style }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const handlePress = useCallback(() => onPress(category), [onPress, category]);
 
   return (
@@ -46,7 +50,7 @@ const CategoryCard = ({ category, onPress, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     borderRadius: radii.xl,
   },

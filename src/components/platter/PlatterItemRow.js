@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "../common/Card";
@@ -6,13 +6,17 @@ import RemoteImage from "../common/RemoteImage";
 import QuantitySelector from "../common/QuantitySelector";
 import { formatCurrency } from "../../utils/currency";
 import { getLineSubtotal } from "../../utils/platterCalculations";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * One line of the order summary: item, unit price, quantity controls, line
  * subtotal and an explicit remove action.
  */
 const PlatterItemRow = ({ item, onIncrement, onDecrement, onRemove }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const handleIncrement = useCallback(
     () => onIncrement(item.foodId),
     [onIncrement, item.foodId]
@@ -70,7 +74,7 @@ const PlatterItemRow = ({ item, onIncrement, onDecrement, onRemove }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     marginBottom: spacing.md,
   },

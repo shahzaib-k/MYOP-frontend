@@ -1,10 +1,14 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
 import { formatMemberSince, getInitials } from "../../utils/profile";
+import useTheme from "../../hooks/useTheme";
 
 /** Avatar with initials, plus the account's name, email and join date. */
 const ProfileHeaderCard = ({ user }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const memberSince = formatMemberSince(user?.createdAt);
 
   return (
@@ -28,7 +32,7 @@ const ProfileHeaderCard = ({ user }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",

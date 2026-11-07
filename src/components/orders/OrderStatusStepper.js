@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const CIRCLE_SIZE = 34;
 
@@ -18,6 +19,9 @@ const STEPS = [
  * timeline that no longer applies.
  */
 const OrderStatusStepper = ({ status }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const currentIndex = Math.max(
     STEPS.findIndex((step) => step.key === status),
     0
@@ -97,7 +101,7 @@ const OrderStatusStepper = ({ status }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     gap: spacing.sm,
   },

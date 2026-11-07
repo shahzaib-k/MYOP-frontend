@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,7 +9,8 @@ import PlatterScreen from "../screens/platter/PlatterScreen";
 import PlatterTabIcon from "../components/navigation/PlatterTabIcon";
 import usePushNotifications from "../hooks/usePushNotifications";
 import { TABS } from "./routes";
-import { colors, typography } from "../constants/theme";
+import { typography } from "../constants/theme";
+import useTheme from "../hooks/useTheme";
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +23,9 @@ const Tab = createBottomTabNavigator();
  * orders no longer requires being mid-flow in the Order tab.
  */
 const MainNavigator = () => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   usePushNotifications();
 
   return (
@@ -88,7 +93,7 @@ const MainNavigator = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   tabBar: {
     backgroundColor: colors.surface,
     borderTopColor: colors.border,

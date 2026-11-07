@@ -22,6 +22,7 @@ export const ENDPOINTS = {
     list: "/api/orders",
     detail: (id) => `/api/orders/${id}`,
     cancel: (id) => `/api/orders/${id}/cancel`,
+    confirmPayment: (id) => `/api/orders/${id}/confirm-payment`,
   },
   recommendations: {
     platter: "/api/recommendations/platter",

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import ScreenContainer from "../../components/common/ScreenContainer";
 import AppHeader from "../../components/common/AppHeader";
@@ -11,13 +11,17 @@ import useFavouriteFoods from "../../hooks/useFavouriteFoods";
 import useFavourites from "../../hooks/useFavourites";
 import usePlatter from "../../hooks/usePlatter";
 import ROUTES from "../../navigation/routes";
-import { colors, spacing } from "../../constants/theme";
+import { spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Every food the customer has hearted, across all categories, with the same
  * add-to-platter controls as the category lists.
  */
 const FavouritesScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { foods, isLoading, isRefreshing, error, refetch, refresh } =
     useFavouriteFoods();
   const { toggleFavourite } = useFavourites();
@@ -125,7 +129,7 @@ const FavouritesScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   body: {
     flex: 1,
   },

@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigator from "./AuthNavigator";
 import MainNavigator from "./MainNavigator";
-import navigationTheme from "./navigationTheme";
+import buildNavigationTheme from "./navigationTheme";
 import { navigationRef } from "./navigationRef";
 import SplashScreen from "../screens/splash/SplashScreen";
 import useAuth from "../hooks/useAuth";
 import usePlatter from "../hooks/usePlatter";
+import useTheme from "../hooks/useTheme";
 import { SPLASH_DURATION } from "../constants/config";
 
 /**
@@ -19,6 +20,12 @@ import { SPLASH_DURATION } from "../constants/config";
 const RootNavigator = () => {
   const { isAuthenticated, isRestoring: isRestoringAuth } = useAuth();
   const { isRestoring: isRestoringPlatter } = usePlatter();
+  const { colors, isDark, isRestoring: isRestoringTheme } = useTheme();
+
+  const navigationTheme = useMemo(
+    () => buildNavigationTheme(colors, isDark),
+    [colors, isDark]
+  );
 
   const [isSplashVisible, setIsSplashVisible] = useState(true);
 
@@ -29,7 +36,7 @@ const RootNavigator = () => {
   }, []);
 
   const isBootstrapping =
-    isSplashVisible || isRestoringAuth || isRestoringPlatter;
+    isSplashVisible || isRestoringAuth || isRestoringPlatter || isRestoringTheme;
 
   if (isBootstrapping) {
     return <SplashScreen />;

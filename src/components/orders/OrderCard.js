@@ -1,18 +1,19 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Badge from "../common/Badge";
 import { formatCurrency } from "../../utils/currency";
 import { getStatusMeta, isActiveOrder } from "../../constants/orderStatus";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
-const ACCENT_BY_TONE = {
+const getAccentByTone = (colors) => ({
   neutral: colors.textMuted,
   success: colors.success,
   warning: colors.warning,
   danger: colors.danger,
   info: colors.info,
-};
+});
 
 const formatDate = (isoString) => {
   const date = new Date(isoString);
@@ -45,6 +46,9 @@ const summarizeItems = (items = []) => {
 
 /** Small "this order is live" indicator — pulses for pending/preparing orders. */
 const PulsingDot = ({ color }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -67,8 +71,11 @@ const PulsingDot = ({ color }) => {
 
 /** One row in the order history list. Tapping opens OrderDetailScreen. */
 const OrderCard = ({ order, onPress, onReorder }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const status = getStatusMeta(order.status);
-  const accentColor = ACCENT_BY_TONE[status.tone] || colors.textMuted;
+  const accentColor = getAccentByTone(colors)[status.tone] || colors.textMuted;
   const itemCount = order.items?.length || 0;
 
   const scale = useRef(new Animated.Value(1)).current;
@@ -142,7 +149,7 @@ const OrderCard = ({ order, onPress, onReorder }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   wrapper: {
     marginBottom: spacing.md,
   },

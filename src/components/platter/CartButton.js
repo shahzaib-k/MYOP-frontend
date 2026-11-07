@@ -1,9 +1,10 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { formatCurrency } from "../../utils/currency";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Floating cart bar. Appears only once the platter has at least one item and
@@ -11,6 +12,9 @@ import { colors, radii, shadows, spacing, typography } from "../../constants/the
  * warning follows the customer down the list.
  */
 const CartButton = ({ itemCount, total, isOverBudget = false, onPress }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const insets = useSafeAreaInsets();
 
   if (itemCount <= 0) {
@@ -50,7 +54,7 @@ const CartButton = ({ itemCount, total, isOverBudget = false, onPress }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   wrapper: {
     position: "absolute",
     left: 0,

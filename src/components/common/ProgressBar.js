@@ -1,9 +1,15 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
-import { colors, radii } from "../../constants/theme";
+import { radii } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /** Budget usage bar. `progress` is 0–1 and is clamped defensively. */
-const ProgressBar = ({ progress = 0, color = colors.primary, height = 6, style }) => {
+const ProgressBar = ({ progress = 0, color: colorOverride, height = 6, style }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const color = colorOverride ?? colors.primary;
+
   const clamped = Math.min(Math.max(progress, 0), 1);
 
   return (
@@ -22,7 +28,7 @@ const ProgressBar = ({ progress = 0, color = colors.primary, height = 6, style }
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   track: {
     backgroundColor: colors.surfaceSunken,
     overflow: "hidden",

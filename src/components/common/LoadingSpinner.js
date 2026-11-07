@@ -1,6 +1,7 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../../constants/theme";
+import { spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Loading indicator. `fullScreen` centres it in the remaining space — use it
@@ -11,14 +12,19 @@ const LoadingSpinner = ({
   fullScreen = true,
   size = "large",
   style,
-}) => (
-  <View style={[fullScreen ? styles.fullScreen : styles.inline, style]}>
-    <ActivityIndicator size={size} color={colors.primary} />
-    {label ? <Text style={styles.label}>{label}</Text> : null}
-  </View>
-);
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
-const styles = StyleSheet.create({
+  return (
+    <View style={[fullScreen ? styles.fullScreen : styles.inline, style]}>
+      <ActivityIndicator size={size} color={colors.primary} />
+      {label ? <Text style={styles.label}>{label}</Text> : null}
+    </View>
+  );
+};
+
+const createStyles = (colors) => StyleSheet.create({
   fullScreen: {
     flex: 1,
     alignItems: "center",

@@ -1,35 +1,46 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
 import { formatCurrency } from "../../utils/currency";
+import useTheme from "../../hooks/useTheme";
 
-const StatTile = ({ label, value, isLoading }) => (
-  <View style={styles.tile}>
-    {isLoading ? (
-      <ActivityIndicator size="small" color={colors.primary} />
-    ) : (
-      <Text style={styles.value} numberOfLines={1} adjustsFontSizeToFit>
-        {value}
-      </Text>
-    )}
-    <Text style={styles.label}>{label}</Text>
-  </View>
-);
+const StatTile = ({ label, value, isLoading }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <View style={styles.tile}>
+      {isLoading ? (
+        <ActivityIndicator size="small" color={colors.primary} />
+      ) : (
+        <Text style={styles.value} numberOfLines={1} adjustsFontSizeToFit>
+          {value}
+        </Text>
+      )}
+      <Text style={styles.label}>{label}</Text>
+    </View>
+  );
+};
 
 /** Three headline numbers: orders placed, orders in progress, total spent. */
-const ProfileStats = ({ stats, isLoading }) => (
-  <View style={styles.row}>
-    <StatTile label="Orders" value={stats.totalOrders} isLoading={isLoading} />
-    <StatTile label="Active" value={stats.activeOrders} isLoading={isLoading} />
-    <StatTile
-      label="Spent"
-      value={formatCurrency(stats.totalSpent)}
-      isLoading={isLoading}
-    />
-  </View>
-);
+const ProfileStats = ({ stats, isLoading }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
-const styles = StyleSheet.create({
+  return (
+    <View style={styles.row}>
+      <StatTile label="Orders" value={stats.totalOrders} isLoading={isLoading} />
+      <StatTile label="Active" value={stats.activeOrders} isLoading={isLoading} />
+      <StatTile
+        label="Spent"
+        value={formatCurrency(stats.totalSpent)}
+        isLoading={isLoading}
+      />
+    </View>
+  );
+};
+
+const createStyles = (colors) => StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: spacing.md,

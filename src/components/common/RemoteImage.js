@@ -1,7 +1,7 @@
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import { ActivityIndicator, Image, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Image with loading and failure states. Food and category images are
@@ -15,6 +15,9 @@ const RemoteImage = ({
   iconSize = 26,
   resizeMode = "cover",
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [isLoading, setIsLoading] = useState(Boolean(uri));
   const [hasFailed, setHasFailed] = useState(false);
 
@@ -50,7 +53,7 @@ const RemoteImage = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   wrapper: {
     backgroundColor: colors.skeleton,
     overflow: "hidden",

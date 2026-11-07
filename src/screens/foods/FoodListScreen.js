@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import ScreenContainer from "../../components/common/ScreenContainer";
 import AppHeader from "../../components/common/AppHeader";
@@ -17,7 +17,8 @@ import useSuggestions from "../../hooks/useSuggestions";
 import { formatCurrency } from "../../utils/currency";
 import MESSAGES from "../../constants/messages";
 import ROUTES from "../../navigation/routes";
-import { colors, spacing } from "../../constants/theme";
+import { spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Step 3: browse a category and build the platter.
@@ -26,6 +27,9 @@ import { colors, spacing } from "../../constants/theme";
  * the suggestions strip and the floating cart all update from one source.
  */
 const FoodListScreen = ({ navigation, route }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { categoryName } = route.params;
 
   const { foods, isLoading, isRefreshing, error, refetch, refresh } =
@@ -164,7 +168,7 @@ const FoodListScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   body: {
     flex: 1,
   },

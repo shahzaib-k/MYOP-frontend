@@ -1,7 +1,7 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Screen shell. Handles safe-area insets once so no screen has to think about
@@ -14,15 +14,22 @@ import { colors } from "../../constants/theme";
 const ScreenContainer = ({
   children,
   style,
-  backgroundColor = colors.background,
+  backgroundColor: backgroundColorOverride,
   edges = ["top"],
-}) => (
-  <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={edges}>
-    <View style={[styles.content, style]}>{children}</View>
-  </SafeAreaView>
-);
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
-const styles = StyleSheet.create({
+  const backgroundColor = backgroundColorOverride ?? colors.background;
+
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor }]} edges={edges}>
+      <View style={[styles.content, style]}>{children}</View>
+    </SafeAreaView>
+  );
+};
+
+const createStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
   },

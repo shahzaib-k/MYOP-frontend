@@ -1,6 +1,7 @@
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const THUMB_INSET = 3;
 
@@ -9,6 +10,9 @@ const THUMB_INSET = 3;
  * ChipGroup on the orders screen. `options` is [{ label, value, count? }].
  */
 const OrderFilterTabs = ({ options, selectedValue, onSelect }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const [containerWidth, setContainerWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
 
@@ -76,7 +80,7 @@ const OrderFilterTabs = ({ options, selectedValue, onSelect }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flexDirection: "row",
     backgroundColor: colors.surfaceSunken,

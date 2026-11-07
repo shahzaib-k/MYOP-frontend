@@ -43,6 +43,9 @@ yarn-error.*
 # local env files (keep .env.example committed)
 .env
 
+# IDE settings (Android Studio / JetBrains) — per-machine, not per-project
+.idea/
+
 # Claude Code local settings (per-machine, not per-project)
 .claude/settings.json
 .claude/settings.local.json

@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -7,13 +7,14 @@ import {
   View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * The app's one button component. Variants keep call sites declarative
  * (`variant="outline"`) instead of each screen restyling a Pressable.
  */
-const VARIANT_STYLES = {
+const getVariantStyles = (colors) => ({
   primary: {
     container: { backgroundColor: colors.primary },
     pressed: { backgroundColor: colors.primaryDark },
@@ -43,7 +44,7 @@ const VARIANT_STYLES = {
     pressed: { backgroundColor: colors.dangerDark },
     label: { color: colors.textInverse },
   },
-};
+});
 
 const SIZE_STYLES = {
   small: { paddingVertical: spacing.sm, minHeight: 38, fontSize: 13 },
@@ -64,7 +65,11 @@ const PrimaryButton = ({
   elevated = false,
   style,
 }) => {
-  const variantStyle = VARIANT_STYLES[variant] || VARIANT_STYLES.primary;
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const variants = useMemo(() => getVariantStyles(colors), [colors]);
+  const variantStyle = variants[variant] || variants.primary;
   const sizeStyle = SIZE_STYLES[size] || SIZE_STYLES.large;
   const isInteractive = !disabled && !isLoading;
 
@@ -116,7 +121,7 @@ const PrimaryButton = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   base: {
     borderRadius: radii.lg,
     alignItems: "center",

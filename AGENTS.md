@@ -14,7 +14,8 @@ Guidance for AI agents working on the "Make Your Own Platter" customer mobile ap
 
 - Every response is `{ success, message, data }` on success and `{ success, message, errors }` on failure. `unwrap()` in `src/api/client.js` pulls out `data`.
 - **`/api/orders` requires a bearer token.** `userId` and `status` are set by the server from the JWT — sending either is a 400.
-- `POST /api/orders` accepts **only** `items: [{ foodId, quantity }]`, `totalPrice?` and `budget?`. Any other key is rejected.
+- `POST /api/orders` accepts **only** `items: [{ foodId, quantity }]`, `totalPrice?`, `budget?` and a required `paymentMethod` (`"cod"` | `"card"`). Any other key is rejected.
+- Card payments (Stripe, **test mode only**): a `card` order response carries `payment: { clientSecret, publishableKey }`. `services/paymentService.js` opens the native payment sheet with those, then `POST /api/orders/:id/confirm-payment` makes the backend verify with Stripe. If the sheet fails or is dismissed, `PlatterView` cancels the unpaid order. Needs an EAS development build (native module), not Expo Go.
 - The server re-reads prices from the `foods` node. A `totalPrice` that disagrees with its own calculation, or a total above `budget`, is rejected.
 - `GET /api/foods/category/:category` is keyed by category **name**, not id.
 - Every food carries `available` (boolean). `available === false` means **sold out**: the card is greyed with a "Sold out" badge and cannot be added (`utils/foodAvailability.js` `isSoldOut`; `PlatterContext.addItem` also refuses it), the server never suggests it, and `POST /api/orders` rejects an order containing it. A food **without** the field counts as available, so the app still works against an older backend.
@@ -72,9 +73,26 @@ The backend sends a push notification when an order is created and on every stat
 - Use descriptive names. No abbreviations like `d`, `res`, `tmp` in application code.
 - Guard against state updates after unmount in any hook that awaits (the `isMounted` ref pattern, as in `useFetch`).
 
+## Theming (light / dark)
+
+- Colours live in `constants/colors.js` as two palettes with identical keys, `lightColors` and `darkColors`. **Never hardcode a hex value** in a component or screen.
+- Components read the active palette with `useTheme()` (`{ colors, isDark, mode, setMode }`) and build styles from it. The pattern every file follows:
+  ```js
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  // ...
+  const createStyles = (colors) => StyleSheet.create({ ... });
+  ```
+  Do **not** `import { colors }` from `constants/theme` in a component — that is the light palette only, for code that cannot use hooks. `spacing`, `radii`, `typography` and `shadows` are theme-independent and still imported directly.
+- A module-level table that needs colours (tones, variants) must be a function of `colors` (`getTones(colors)`), not a constant. A parameter default must not reference `colors` — it runs before the hook; resolve it in the body instead (`const bg = override ?? colors.background`).
+- `ThemeProvider` follows the phone by default and calls `Appearance.setColorScheme` so native dialogs and the keyboard match. On Android in this React Native version the "follow the phone" value is the string `"unspecified"` — passing `null` crashes the native module.
+- `app.json` must keep `"userInterfaceStyle": "automatic"`. With `"light"`, the Expo dev client forces React Native's colour scheme to light and the app can never see the phone's dark mode.
+- The Profile screen's Appearance card (`components/profile/AppearanceSelector.js`) is the only place the choice is changed.
+
 ## State Management
 
-- Global state is React Context. Three providers only:
+- Global state is React Context. Four providers only:
+  - `ThemeContext` — light/dark palette and the customer's choice (`system` | `light` | `dark`, persisted). See **Theming** below.
   - `AuthContext` — user, token, sign in/up/out, session restore
   - `FavouritesContext` — the hearted food ids, stored on the device per account (`STORAGE_KEYS.favouritesFor(userId)`). Ids only; `useFavouriteFoods` resolves them against the live menu so prices and sold-out state are never stale. Needs no backend.
   - `PlatterContext` — budget, selected items, derived totals (uses `useReducer`)

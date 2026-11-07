@@ -1,4 +1,4 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "../common/Card";
@@ -8,7 +8,8 @@ import QuantitySelector from "../common/QuantitySelector";
 import Badge from "../common/Badge";
 import { formatCurrency } from "../../utils/currency";
 import { isSoldOut } from "../../utils/foodAvailability";
-import { colors, spacing, typography } from "../../constants/theme";
+import { spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Food list row: image, name, description, price and either an Add button or
@@ -32,6 +33,9 @@ const FoodCard = ({
   onRemove,
   onToggleFavourite,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const handleAdd = useCallback(() => onAdd(food), [onAdd, food]);
   const handleIncrement = useCallback(
     () => onIncrement(food.id),
@@ -167,7 +171,7 @@ const FoodCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     marginBottom: spacing.md,
   },

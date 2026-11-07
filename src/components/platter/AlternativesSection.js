@@ -1,9 +1,10 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Badge from "../common/Badge";
 import { formatCurrency } from "../../utils/currency";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Over-budget rescue: cheaper items from the same category, straight from
@@ -15,6 +16,9 @@ import { colors, radii, spacing, typography } from "../../constants/theme";
  *      options: [{ foodId, name, category, price, image, savings }] }]
  */
 const AlternativesSection = ({ alternatives, onSwap, style }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (!alternatives || alternatives.length === 0) {
     return null;
   }
@@ -75,7 +79,7 @@ const AlternativesSection = ({ alternatives, onSwap, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     backgroundColor: colors.primarySoft,
     borderRadius: radii.xl,

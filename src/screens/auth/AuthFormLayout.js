@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,7 +10,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenContainer from "../../components/common/ScreenContainer";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Shared chrome for Login and Register: branded header, keyboard handling,
@@ -23,44 +25,49 @@ const AuthFormLayout = ({
   footerText,
   footerActionLabel,
   onFooterAction,
-}) => (
-  <ScreenContainer>
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <ScreenContainer>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.header}>
-          <View style={styles.logo}>
-            <Ionicons name="restaurant" size={26} color={colors.textInverse} />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View style={styles.logo}>
+              <Ionicons name="restaurant" size={26} color={colors.textInverse} />
+            </View>
+
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subtitle}>{subtitle}</Text>
           </View>
 
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
+          <View style={styles.body}>{children}</View>
 
-        <View style={styles.body}>{children}</View>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>{footerText}</Text>
+            <Pressable
+              onPress={onFooterAction}
+              hitSlop={8}
+              accessibilityRole="button"
+            >
+              <Text style={styles.footerAction}>{footerActionLabel}</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </ScreenContainer>
+  );
+};
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>{footerText}</Text>
-          <Pressable
-            onPress={onFooterAction}
-            hitSlop={8}
-            accessibilityRole="button"
-          >
-            <Text style={styles.footerAction}>{footerActionLabel}</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  </ScreenContainer>
-);
-
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   flex: {
     flex: 1,
   },

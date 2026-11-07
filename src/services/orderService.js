@@ -4,15 +4,16 @@ import { toOrderItems } from "../utils/platterCalculations";
 import { roundAmount } from "../utils/currency";
 
 /**
- * POST /api/orders accepts exactly three fields — items, totalPrice, budget —
+ * POST /api/orders accepts exactly four fields — items, totalPrice, budget,
+ * paymentMethod ("cod" | "card", required) —
  * and rejects anything else with a 400. userId and status come from the token
  * and the server, never from the client.
  *
  * totalPrice and budget are sent so the backend can cross-check our maths:
  * a mismatch or an over-budget platter is rejected server-side.
  */
-export const placeOrder = async ({ items, totalPrice, budget }) => {
-  const payload = { items: toOrderItems(items) };
+export const placeOrder = async ({ items, totalPrice, budget, paymentMethod }) => {
+  const payload = { items: toOrderItems(items), paymentMethod };
 
   if (Number(totalPrice) > 0) {
     payload.totalPrice = roundAmount(totalPrice);

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -9,7 +10,8 @@ import ScreenContainer from "../../components/common/ScreenContainer";
 import AppHeader from "../../components/common/AppHeader";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import ErrorMessage from "../../components/common/ErrorMessage";
-import { colors, spacing } from "../../constants/theme";
+import { spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Shared shell for the profile form screens: a header with a back button,
@@ -25,35 +27,40 @@ const ProfileFormLayout = ({
   onSubmit,
   isSubmitting,
   children,
-}) => (
-  <ScreenContainer>
-    <AppHeader title={title} subtitle={subtitle} onBack={onBack} />
+}) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+  return (
+    <ScreenContainer>
+      <AppHeader title={title} subtitle={subtitle} onBack={onBack} />
+
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <ErrorMessage message={error} details={errorDetails} />
-        {children}
-      </ScrollView>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <ErrorMessage message={error} details={errorDetails} />
+          {children}
+        </ScrollView>
 
-      <View style={styles.footer}>
-        <PrimaryButton
-          label={submitLabel}
-          onPress={onSubmit}
-          isLoading={isSubmitting}
-        />
-      </View>
-    </KeyboardAvoidingView>
-  </ScreenContainer>
-);
+        <View style={styles.footer}>
+          <PrimaryButton
+            label={submitLabel}
+            onPress={onSubmit}
+            isLoading={isSubmitting}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    </ScreenContainer>
+  );
+};
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   flex: {
     flex: 1,
   },

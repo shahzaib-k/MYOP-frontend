@@ -2,10 +2,11 @@
   "expo": {
     "name": "Make Your Own Platter",
     "slug": "myop",
+    "scheme": "myop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.fyp.makeyourownplatter"
@@ -34,6 +35,13 @@
         {
           "color": "#FF5A1F",
           "defaultChannel": "default"
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.fyp.makeyourownplatter",
+          "enableGooglePay": false
         }
       ]
     ],

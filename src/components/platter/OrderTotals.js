@@ -1,7 +1,8 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { formatCurrency } from "../../utils/currency";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 /**
  * Subtotal / total breakdown for the order summary.
@@ -9,53 +10,58 @@ import { colors, radii, spacing, typography } from "../../constants/theme";
  * delivery charges; both are shown so the breakdown reads normally and any
  * future charge has an obvious place to live.
  */
-const OrderTotals = ({ summary, style }) => (
-  <View style={[styles.container, style]}>
-    <View style={styles.line}>
-      <Text style={styles.label}>
-        Subtotal ({summary.itemCount} {summary.itemCount === 1 ? "item" : "items"})
-      </Text>
-      <Text style={styles.value}>{formatCurrency(summary.subtotal)}</Text>
+const OrderTotals = ({ summary, style }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.line}>
+        <Text style={styles.label}>
+          Subtotal ({summary.itemCount} {summary.itemCount === 1 ? "item" : "items"})
+        </Text>
+        <Text style={styles.value}>{formatCurrency(summary.subtotal)}</Text>
+      </View>
+
+      <View style={styles.line}>
+        <Text style={styles.label}>Charges</Text>
+        <Text style={styles.value}>{formatCurrency(0)}</Text>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.line}>
+        <Text style={styles.totalLabel}>Total</Text>
+        <Text
+          style={[
+            styles.totalValue,
+            summary.isOverBudget && styles.totalValueOverBudget,
+          ]}
+        >
+          {formatCurrency(summary.total)}
+        </Text>
+      </View>
+
+      <View style={styles.line}>
+        <Text style={styles.label}>
+          {summary.isOverBudget ? "Over budget by" : "Remaining budget"}
+        </Text>
+        <Text
+          style={[
+            styles.value,
+            { color: summary.isOverBudget ? colors.danger : colors.success },
+          ]}
+        >
+          {formatCurrency(
+            summary.isOverBudget ? summary.amountOverBudget : summary.remaining
+          )}
+        </Text>
+      </View>
     </View>
+  );
+};
 
-    <View style={styles.line}>
-      <Text style={styles.label}>Charges</Text>
-      <Text style={styles.value}>{formatCurrency(0)}</Text>
-    </View>
-
-    <View style={styles.divider} />
-
-    <View style={styles.line}>
-      <Text style={styles.totalLabel}>Total</Text>
-      <Text
-        style={[
-          styles.totalValue,
-          summary.isOverBudget && styles.totalValueOverBudget,
-        ]}
-      >
-        {formatCurrency(summary.total)}
-      </Text>
-    </View>
-
-    <View style={styles.line}>
-      <Text style={styles.label}>
-        {summary.isOverBudget ? "Over budget by" : "Remaining budget"}
-      </Text>
-      <Text
-        style={[
-          styles.value,
-          { color: summary.isOverBudget ? colors.danger : colors.success },
-        ]}
-      >
-        {formatCurrency(
-          summary.isOverBudget ? summary.amountOverBudget : summary.remaining
-        )}
-      </Text>
-    </View>
-  </View>
-);
-
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     backgroundColor: colors.surfaceAlt,
     borderRadius: radii.xl,

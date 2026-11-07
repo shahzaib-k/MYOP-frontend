@@ -23,13 +23,17 @@ import { formatCurrency } from "../../utils/currency";
 import { getColumnCount } from "../../utils/responsive";
 import MESSAGES from "../../constants/messages";
 import ROUTES from "../../navigation/routes";
-import { colors, radii, spacing } from "../../constants/theme";
+import { radii, spacing } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const MIN_TILE_WIDTH = 168;
 const GRID_PADDING = spacing.xl * 2;
 
 /** Step 2: pick a category to browse. */
 const CategoriesScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { categories, isLoading, isRefreshing, error, refetch, refresh } =
     useCategories();
   const { summary, budget } = usePlatter();
@@ -147,7 +151,7 @@ const CategoriesScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   body: {
     flex: 1,
   },

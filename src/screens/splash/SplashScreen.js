@@ -1,12 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors, radii, shadows, spacing, typography } from "../../constants/theme";
+import { radii, shadows, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const DOT_COUNT = 3;
 
 /** One dot of the loading indicator, pulsing on a delay from its neighbours. */
 const LoadingDot = ({ delay }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -42,6 +46,9 @@ const LoadingDot = ({ delay }) => {
  * is no flash of the wrong screen on cold start.
  */
 const SplashScreen = () => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const fade = useRef(new Animated.Value(0)).current;
   const lift = useRef(new Animated.Value(16)).current;
   const ringScale = useRef(new Animated.Value(0.85)).current;
@@ -100,7 +107,7 @@ const SplashScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",

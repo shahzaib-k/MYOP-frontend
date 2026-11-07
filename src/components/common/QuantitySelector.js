@@ -1,8 +1,9 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { MAX_ITEM_QUANTITY } from "../../constants/config";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const SIZES = {
   small: { button: 28, icon: 15, minWidth: 26 },
@@ -22,6 +23,9 @@ const QuantitySelector = ({
   maxQuantity = MAX_ITEM_QUANTITY,
   style,
 }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const dimensions = SIZES[size] || SIZES.medium;
   const canIncrement = quantity < maxQuantity;
 
@@ -66,7 +70,7 @@ const QuantitySelector = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useMemo } from "react";
 import { Alert, Animated, ScrollView, StyleSheet, Text, View } from "react-native";
 import ScreenContainer from "../../components/common/ScreenContainer";
 import AppHeader from "../../components/common/AppHeader";
@@ -14,7 +14,9 @@ import useReorder from "../../hooks/useReorder";
 import { cancelOrder, fetchOrderById } from "../../services/orderService";
 import { formatCurrency } from "../../utils/currency";
 import { canCancelOrder, getStatusMeta } from "../../constants/orderStatus";
-import { colors, radii, spacing, typography } from "../../constants/theme";
+import { getPaymentMethodLabel, getPaymentStatusMeta } from "../../constants/paymentMethods";
+import { radii, spacing, typography } from "../../constants/theme";
+import useTheme from "../../hooks/useTheme";
 
 const formatDateTime = (isoString) => {
   const date = new Date(isoString);
@@ -34,6 +36,9 @@ const formatDateTime = (isoString) => {
  *    it via GET /api/orders/:id instead.
  */
 const OrderDetailScreen = ({ navigation, route }) => {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const { order: initialOrder, orderId } = route.params || {};
 
   const request = useCallback(
@@ -148,6 +153,18 @@ const OrderDetailScreen = ({ navigation, route }) => {
             <Text style={styles.totalValue}>{formatCurrency(order.totalPrice)}</Text>
           </View>
 
+          <View style={styles.row}>
+            <Text style={styles.label}>Payment</Text>
+            <Text style={styles.value}>{getPaymentMethodLabel(order.paymentMethod)}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Payment status</Text>
+            <Badge
+              label={getPaymentStatusMeta(order.paymentStatus).label}
+              tone={getPaymentStatusMeta(order.paymentStatus).tone}
+            />
+          </View>
+
           {order.budget ? (
             <>
               <View style={styles.row}>
@@ -210,7 +227,7 @@ const OrderDetailScreen = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   content: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing.xl,
